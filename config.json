@@ -1,0 +1,36 @@
+{
+  "_comentario": "Perfil junior: data entry y data analyst. Búsqueda internacional, sin limitarse a España.",
+  "keywords": ["data analyst", "data entry", "sql", "excel", "power bi", "reporting", "analista de datos", "entrada de datos", "back office", "virtual assistant"],
+  "require_title_any": [],
+  "exclude_title": ["senior", "lead", "principal", "staff", "head", "director", "manager", "scientist", "engineer", "architect", "intern", "internship"],
+  "exclude_text": [
+    "us only", "usa only", "u.s. only", "us citizens", "us citizen",
+    "us-based only", "must reside in the us", "must be located in the us",
+    "security clearance", "on-site only", "onsite only", "in-office",
+    "registration fee", "pay a fee", "training fee", "wire transfer",
+    "cashier's check"
+  ],
+  "boost_words": ["junior", "entry level", "entry-level", "associate"],
+  "geo_allow": [
+    "worldwide", "anywhere", "global", "international", "any country", "all countries",
+    "europe", "emea", "eu", "european union", "spain", "españa",
+    "cet", "cest", "utc+1", "gmt+1", "utc", "gmt"
+  ],
+  "min_salary_eur_year": 0,
+  "max_age_days": 30,
+  "max_batch": 30,
+  "min_score_to_save": 6,
+  "top_score": 8,
+  "remotive_category": "",
+  "wwr_feeds": [],
+  "jobicy_geo": "",
+  "sources": {
+    "remotive": true,
+    "remoteok": true,
+    "weworkremotely": false,
+    "arbeitnow": true,
+    "himalayas": true,
+    "jobicy": true,
+    "workingnomads": true
+  }
+}

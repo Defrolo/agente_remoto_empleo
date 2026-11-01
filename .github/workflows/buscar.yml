@@ -1,0 +1,81 @@
+name: Buscar trabajo remoto
+
+on:
+  schedule:
+    - cron: "17 6 * * 1-5"   # L-V 06:17 UTC (07:17/08:17 en España). Minuto "raro" para evitar picos.
+  workflow_dispatch:
+    inputs:
+      keywords:
+        description: "Palabras clave extra, separadas por comas (opcional)"
+        required: false
+        default: ""
+
+concurrency:
+  group: buscar
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  buscar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Tests del pipeline
+        run: python -m unittest discover -s tests
+
+      - name: Estado de las fuentes (informativo)
+        continue-on-error: true
+        run: python scripts/jobs.py check
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Instalar OpenCode
+        run: npm install -g opencode-ai@${{ vars.OPENCODE_VERSION || 'latest' }}
+
+      - name: Ejecutar agente
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          EXTRA_KEYWORDS: ${{ inputs.keywords }}
+        run: |
+          timeout 20m opencode run --agent job-hunter \
+            "Ejecuta el flujo completo de búsqueda de hoy. Palabras clave extra (opcional): $EXTRA_KEYWORDS"
+
+      - name: Regenerar informe
+        run: python scripts/jobs.py report
+
+      - name: Avisar por Telegram
+        continue-on-error: true
+        env:
+          TG_TOKEN: ${{ secrets.TG_TOKEN }}
+          TG_CHAT: ${{ secrets.TG_CHAT }}
+        run: python scripts/jobs.py notify
+
+      - name: Resumen en la ejecución
+        if: always()
+        run: python scripts/jobs.py stats >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Guardar resultados en el repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add ofertas.md data/jobs.db cartas
+          git diff --staged --quiet || git commit -m "Ofertas $(date -u +%F)"
+          git push
+
+      - name: Avisar si falla
+        if: failure()
+        continue-on-error: true
+        env:
+          TG_TOKEN: ${{ secrets.TG_TOKEN }}
+          TG_CHAT: ${{ secrets.TG_CHAT }}
+        run: python scripts/jobs.py notify --message "⚠️ Falló la búsqueda de trabajo. Revisa la pestaña Actions."
