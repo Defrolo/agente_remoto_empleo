@@ -44,7 +44,7 @@ jobs:
 
       - name: Ejecutar agente
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          FREE_LLM_API_KEY: ${{ secrets.FREE_LLM_API_KEY }}
           EXTRA_KEYWORDS: ${{ inputs.keywords }}
         run: |
           timeout 20m opencode run --agent job-hunter \
