@@ -2,7 +2,7 @@ name: Buscar trabajo remoto
 
 on:
   schedule:
-    - cron: "17 6 * * 1-5"   # L-V 06:17 UTC (07:17/08:17 en España). Minuto "raro" para evitar picos.
+    - cron: "17 6 * * 1-5"   # L-V 06:17 UTC
   workflow_dispatch:
     inputs:
       keywords:
@@ -20,7 +20,7 @@ permissions:
 jobs:
   buscar:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 
@@ -31,37 +31,15 @@ jobs:
       - name: Tests del pipeline
         run: python -m unittest discover -s tests
 
-      - name: Estado de las fuentes (informativo)
-        continue-on-error: true
-        run: python scripts/jobs.py check
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: Instalar OpenCode
-        run: npm install -g opencode-ai@${{ vars.OPENCODE_VERSION || 'latest' }}
-
-      - name: Configurar proveedor OpenCode
-        run: |
-          mkdir -p ~/.config/opencode
-          cat << 'EOF' > ~/.config/opencode/config.json
-          {
-            "provider": {
-              "freellmapi": {
-                "apiKey": "${{ secrets.FREE_LLM_API_KEY }}"
-              }
-            }
-          }
-          EOF
-
-      - name: Ejecutar agente
+      - name: Descargar y filtrar ofertas
         env:
-          FREE_LLM_API_KEY: ${{ secrets.FREE_LLM_API_KEY }}
           EXTRA_KEYWORDS: ${{ inputs.keywords }}
         run: |
-          timeout 20m opencode run --agent job-hunter \
-            "Ejecuta el flujo completo de búsqueda de hoy. Palabras clave extra (opcional): $EXTRA_KEYWORDS"
+          if [ -n "$EXTRA_KEYWORDS" ]; then
+            python scripts/jobs.py fetch --keywords "$EXTRA_KEYWORDS"
+          else
+            python scripts/jobs.py fetch
+          fi
 
       - name: Regenerar informe
         run: python scripts/jobs.py report
