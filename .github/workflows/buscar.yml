@@ -42,6 +42,19 @@ jobs:
       - name: Instalar OpenCode
         run: npm install -g opencode-ai@${{ vars.OPENCODE_VERSION || 'latest' }}
 
+      - name: Configurar proveedor OpenCode
+        run: |
+          mkdir -p ~/.config/opencode
+          cat << 'EOF' > ~/.config/opencode/config.json
+          {
+            "provider": {
+              "freellmapi": {
+                "apiKey": "${{ secrets.FREE_LLM_API_KEY }}"
+              }
+            }
+          }
+          EOF
+
       - name: Ejecutar agente
         env:
           FREE_LLM_API_KEY: ${{ secrets.FREE_LLM_API_KEY }}
