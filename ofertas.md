@@ -1,6 +1,6 @@
 # Ofertas de trabajo remoto
 
-_Actualizado: 2026-11-05 14:36 UTC_
+_Actualizado: 2026-11-06 14:13 UTC_
 
 ## En proceso
 
@@ -13,4 +13,4 @@ _Sin ofertas nuevas por encima del umbral._
 
 
 ---
-Embudo: 488 vistas · 464 filtradas · 0 puntuadas · 24 pendientes · 0 cerradas (rechazadas/descartadas).
+Embudo: 565 vistas · 536 filtradas · 0 puntuadas · 29 pendientes · 0 cerradas (rechazadas/descartadas).
